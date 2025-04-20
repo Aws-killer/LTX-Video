@@ -187,6 +187,12 @@ def main():
         default=None,
         help="Path to the folder to save output video, if None will save in outputs/ directory.",
     )
+    parser.add_argument(
+        "--output_path",
+        type=str,
+        default=None,
+        help="Path to the folder to save output video, if None will save in outputs/ directory.",
+    )
     parser.add_argument("--seed", type=int, default="171198")
 
     # Pipeline parameters
