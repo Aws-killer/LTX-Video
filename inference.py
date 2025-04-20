@@ -187,12 +187,6 @@ def main():
         default=None,
         help="Path to the folder to save output video, if None will save in outputs/ directory.",
     )
-    parser.add_argument(
-        "--output_path",
-        type=str,
-        default=None,
-        help="Path to the folder to save output video, if None will save in outputs/ directory.",
-    )
     parser.add_argument("--seed", type=int, default="171198")
 
     # Pipeline parameters
@@ -655,6 +649,7 @@ def infer(
         pad_right = images.shape[4]
     images = images[:, :, :num_frames, pad_top:pad_bottom, pad_left:pad_right]
 
+    output_files = []
     for i in range(images.shape[0]):
         # Gathering from B, C, F, H, W to C, F, H, W and then permuting to F, H, W, C
         video_np = images[i].permute(1, 2, 3, 0).cpu().float().numpy()
@@ -673,6 +668,7 @@ def infer(
                 dir=output_dir,
             )
             imageio.imwrite(output_filename, video_np[0])
+            output_files.append(output_filename)
         else:
             output_filename = get_unique_filename(
                 f"video_output_{i}",
@@ -687,8 +683,11 @@ def infer(
             with imageio.get_writer(output_filename, fps=fps) as video:
                 for frame in video_np:
                     video.append_data(frame)
+            output_files.append(output_filename)
 
         logger.warning(f"Output saved to {output_dir}")
+    
+    return output_files[0] if output_files else None
 
 
 def prepare_conditioning(
